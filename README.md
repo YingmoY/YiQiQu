@@ -44,31 +44,48 @@
 ## 🚀 快速启动
 
 ### 环境要求
-- Go 1.22+
+- Go 1.25
 - Node.js 22+
 - PostgreSQL 15+
 
-### 1. 数据库配置
-1. 创建 PostgreSQL 数据库 `yiqiqu`。
-2. 首先执行原始 `public.sql` 初始化基础结构。
-3. 执行 `modify.sql` 以应用最新的功能变更和表结构优化。
+### 1. 数据库
 
-### 2. 后端启动
+项目使用 PostgreSQL。若是全新库，可先导入原始 `public.sql`，再执行本次新增的 `modify.sql`；若后端允许 AutoMigrate，也可由后端启动时自动补齐新增表结构。
+
+```bash
+psql "$DATABASE_URL" -f public.sql
+psql "$DATABASE_URL" -f modify.sql
+```
+
+建议生产环境显式执行 `modify.sql`，以便掌控数据库变更。示例管理员账号仍为 `admin@fudan.edu.cn`，脚本中已确保该账号角色为 `admin`。
+
+### 2. 后端
+
 ```bash
 cd back
-go mod download
-go run main.go
+export DATABASE_URL="host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
+export JWT_SECRET="请替换为生产环境随机密钥"
+go mod tidy
+go run .
 ```
-*后端默认运行在 `http://localhost:8080`*
 
-### 3. 前端启动
+后端默认监听 `:8080`，接口前缀为 `/api/v1`。
+
+### 3. 前端
+
 ```bash
 cd front
 pnpm install
 pnpm dev
 ```
-*前端 H5 访问地址：`http://localhost:5173`*
-*管理后台访问地址：`http://localhost:5173/admin`*
+
+生产构建命令如下：
+
+```bash
+pnpm build
+```
+
+如后端地址不是默认 `/api/v1` 同源代理，请根据现有前端配置调整 API 基础地址。
 
 ## 📁 目录结构
 
